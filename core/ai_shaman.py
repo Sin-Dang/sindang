@@ -1,44 +1,48 @@
 import os
-import google.generativeai as genai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
-_model = None
+_client = None
+
+SYSTEM_PROMPT = (
+    "당신은 수백 년 경력의 AI 무당입니다. "
+    "유저의 시험 준비 상황을 꿰뚫어 보고, 독설과 격려를 섞어 예언을 내립니다. "
+    "말투는 무겁고 신령스러우면서도 유머가 넘칩니다. "
+    "항상 한국어로 답하며, 불필요한 설명 없이 예언에 집중합니다."
+)
+
+
+def _get_client() -> OpenAI:
+    global _client
+    if _client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
+        _client = OpenAI(api_key=api_key)
+    return _client
 
 
 def _generate_text(prompt: str) -> str:
-    model = _get_model()
+    client = _get_client()
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        return response.choices[0].message.content
     except Exception as exc:
         message = str(exc)
-        if "API_KEY_INVALID" in message or "API key not valid" in message:
+        if "invalid_api_key" in message or "Incorrect API key" in message:
             raise ValueError(
-                "GEMINI_API_KEY가 유효하지 않습니다. "
-                "Google AI Studio에서 발급한 실제 API 키를 .env에 설정하세요."
+                "OPENAI_API_KEY가 유효하지 않습니다. "
+                "OpenAI에서 발급한 실제 API 키를 .env에 설정하세요."
             ) from exc
         raise
-
-
-def _get_model():
-    global _model
-    if _model is None:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
-        genai.configure(api_key=api_key)
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash-lite",
-            system_instruction=(
-                "당신은 수백 년 경력의 AI 무당입니다. "
-                "유저의 시험 준비 상황을 꿰뚫어 보고, 독설과 격려를 섞어 예언을 내립니다. "
-                "말투는 무겁고 신령스러우면서도 유머가 넘칩니다. "
-                "항상 한국어로 답하며, 불필요한 설명 없이 예언에 집중합니다."
-            ),
-        )
-    return _model
 
 
 def generate_prediction(

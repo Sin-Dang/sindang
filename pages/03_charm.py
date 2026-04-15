@@ -49,7 +49,7 @@ if not get("charm_image_bytes"):
 img_bytes = get("charm_image_bytes")
 if img_bytes:
     st.subheader("🖼️ 나만의 합격 부적")
-    st.image(img_bytes, use_container_width=True)
+    st.image(img_bytes, use_column_width=True)
 
     st.download_button(
         label="💾 부적 다운로드 (PNG)",
