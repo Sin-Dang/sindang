@@ -1,5 +1,16 @@
 import streamlit as st
 
+
+def hide_deploy_button():
+    st.markdown("""
+        <style>
+        [data-testid="stAppDeployButton"],
+        [data-testid="stToolbar"],
+        #MainMenu,
+        header { visibility: hidden; }
+        </style>
+    """, unsafe_allow_html=True)
+
 SESSION_KEYS = {
     "user_name": "",
     "birth_date": None,

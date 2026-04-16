@@ -1,10 +1,11 @@
 import streamlit as st
-from utils.session import init_session_state, get, set, is_result_ready
+from utils.session import init_session_state, get, set, is_result_ready, hide_deploy_button
 from core.ai_shaman import generate_charm_phrase
 from charm.charm_generator import generate_charm_image
 
 st.set_page_config(page_title="부적 생성 | 벼락치기 무당", page_icon="🧧", layout="centered")
 init_session_state()
+hide_deploy_button()
 
 if not is_result_ready():
     st.warning("먼저 예언을 확인해주세요.")

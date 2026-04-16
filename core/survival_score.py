@@ -54,12 +54,12 @@ def calculate_survival_score(
 def get_survival_grade(score: float) -> tuple[str, str]:
     """점수에 따른 등급과 한줄 평을 반환한다."""
     if score >= 80:
-        return "S", "기적의 생존자"
+        return "A", "기적의 생존자"
     elif score >= 60:
-        return "A", "희망이 보인다"
+        return "B", "희망이 보인다"
     elif score >= 40:
-        return "B", "운에 맡겨라"
+        return "C", "운에 맡겨라"
     elif score >= 20:
-        return "C", "조상님도 포기"
+        return "D", "조상님도 포기"
     else:
-        return "D", "이미 저세상"
+        return "F", "이미 저세상"

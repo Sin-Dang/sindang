@@ -1,10 +1,11 @@
 import streamlit as st
 from datetime import date
-from utils.session import init_session_state, set
+from utils.session import init_session_state, set, hide_deploy_button
 from core.fortune import get_fortune_context
 
 st.set_page_config(page_title="정보 입력 | 벼락치기 무당", page_icon="📋", layout="centered")
 init_session_state()
+hide_deploy_button()
 
 st.title("📋 Step 1: 운명 데이터 입력")
 st.caption("정확할수록 예언의 정밀도가 높아집니다. (거짓말하면 조상님이 압니다)")
