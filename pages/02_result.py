@@ -66,11 +66,13 @@ prediction = get("prediction_data") or {}
 st.divider()
 st.subheader(f"🎯 {get('user_name')}님의 시험 생존 확률")
 
-col1, col2 = st.columns([1, 2])
+col1, col2, col3 = st.columns([1, 1, 2])
 with col1:
     st.metric("생존 점수", f"{score}점")
-    st.metric("등급", f"{grade} — {grade_label}")
 with col2:
+    st.metric("등급", grade)
+    st.caption(grade_label)
+with col3:
     st.progress(int(score), text=f"{score}% 생존 가능성")
 
 st.divider()

@@ -1,4 +1,5 @@
 import os
+import re
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -22,6 +23,27 @@ def _get_client() -> OpenAI:
             raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
         _client = OpenAI(api_key=api_key)
     return _client
+
+
+def _clean_section(text: str) -> str:
+    """AI 응답에서 말줄임표·괄호 안내문·빈 줄 등을 정리한다."""
+    lines = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        # 말줄임표만 있는 줄 제거
+        if re.fullmatch(r'[\.…\s]+', line):
+            continue
+        # 괄호로만 이루어진 안내 문구 제거 (예: "(예언 내용)")
+        if re.fullmatch(r'\(.*\)', line):
+            continue
+        # 문장 끝 말줄임표 → 마침표로 교체
+        line = re.sub(r'[\.…]{2,}\s*$', '.', line)
+        # 문장 중간 연속 점(3개 이상) → 줄임표 기호로 통일
+        line = re.sub(r'\.{3,}', '…', line)
+        lines.append(line)
+    return '\n'.join(lines)
 
 
 def _generate_text(prompt: str) -> str:
@@ -108,7 +130,7 @@ AI 생존 점수: {survival_score}점 / 100점 (등급: {survival_grade})
         elif current and line:
             sections[current] += line + "\n"
 
-    return {k: v.strip() for k, v in sections.items()}
+    return {k: _clean_section(v) for k, v in sections.items()}
 
 
 def generate_charm_phrase(
