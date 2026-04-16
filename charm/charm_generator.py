@@ -21,7 +21,24 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     for font_file in ["NanumBrush.ttf", "NanumMyeongjo.ttf", "NanumGothic.ttf"]:
         path = os.path.join(FONTS_DIR, font_file)
         if os.path.exists(path):
-            return ImageFont.truetype(path, size)
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                try:
+                    return ImageFont.truetype(path, size, index=0)
+                except Exception:
+                    continue
+    # 시스템 폰트 폴백
+    for sys_font in [
+        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+        "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
+        "/System/Library/Fonts/Supplemental/NotoSansGothic-Regular.ttf",
+    ]:
+        if os.path.exists(sys_font):
+            try:
+                return ImageFont.truetype(sys_font, size, index=0)
+            except Exception:
+                continue
     return ImageFont.load_default()
 
 
