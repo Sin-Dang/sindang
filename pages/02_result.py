@@ -1,12 +1,12 @@
 import streamlit as st
-from utils.session import init_session_state, get, set, is_input_complete, hide_deploy_button
+from utils.session import init_session_state, get, set, is_input_complete, apply_theme
 from utils.loading_messages import get_all_messages
 from core.survival_score import calculate_survival_score, get_survival_grade
 from core.ai_shaman import generate_prediction
 
 st.set_page_config(page_title="예언 결과 | 벼락치기 무당", page_icon="🔮", layout="centered")
 init_session_state()
-hide_deploy_button()
+apply_theme()
 
 if not is_input_complete():
     st.warning("먼저 정보를 입력해주세요.")

@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.session import init_session_state, hide_deploy_button
+from utils.session import init_session_state, apply_theme
 
 st.set_page_config(
     page_title="벼락치기 무당",
@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 init_session_state()
-hide_deploy_button()
+apply_theme()
 
 st.title("🔮 벼락치기 무당")
 st.subheader("시험 생존 확률 예언 서비스")

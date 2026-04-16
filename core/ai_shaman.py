@@ -67,7 +67,7 @@ def generate_prediction(
 
 시험 상황:
 - 과목: {subject}
-- 남은 시간: {time_remaining_min}분
+- 남은 시간: {time_remaining_min // 60}시간 {time_remaining_min % 60}분
 - 진도율: {progress_pct}%
 - 아는 내용 비중: {known_pct}%
 
