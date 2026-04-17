@@ -131,6 +131,16 @@ def apply_theme():
             box-shadow: 0 0 20px rgba(241,196,15,0.55) !important;
         }}
 
+        /* ── metric 카드 ── */
+        [data-testid="stMetricValue"] {{
+            color: #F1C40F !important;
+            opacity: 1 !important;
+        }}
+        [data-testid="stMetricLabel"] {{
+            color: #D4AF37 !important;
+            opacity: 1 !important;
+        }}
+
         /* ── 구분선 ── */
         hr {{
             border-color: rgba(212,175,55,0.35) !important;
