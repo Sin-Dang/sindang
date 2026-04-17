@@ -5,7 +5,8 @@
       "Bash(git remote:*)",
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
-      "Bash(/opt/anaconda3/bin/python -c ' *)"
+      "Bash(/opt/anaconda3/bin/python -c ' *)",
+      "Bash(python -c \"from dotenv import load_dotenv; import os; load_dotenv\\(\\); key=os.getenv\\('OPENAI_API_KEY',''\\); print\\('키 존재:', bool\\(key\\)\\); print\\('키 앞 10자:', key[:10] if key else '없음'\\)\")"
     ]
   }
 }
