@@ -1,10 +1,11 @@
 import streamlit as st
 from datetime import date
-from utils.session import init_session_state, set
+from utils.session import init_session_state, set, apply_theme
 from core.fortune import get_fortune_context
 
 st.set_page_config(page_title="정보 입력 | 벼락치기 무당", page_icon="📋", layout="centered")
 init_session_state()
+apply_theme()
 
 st.title("📋 Step 1: 운명 데이터 입력")
 st.caption("정확할수록 예언의 정밀도가 높아집니다. (거짓말하면 조상님이 압니다)")
@@ -23,9 +24,9 @@ with st.form("input_form"):
     st.divider()
     st.subheader("📚 시험 정보")
     subject = st.text_input("과목명", placeholder="예: 자료구조, 미적분학")
-    time_remaining_min = st.number_input(
-        "시험 시작까지 남은 시간 (분)",
-        min_value=0, max_value=10000, value=120, step=10,
+    time_remaining_hours = st.number_input(
+        "시험 시작까지 남은 시간 (시간)",
+        min_value=0, max_value=72, value=2, step=1,
     )
 
     st.divider()
@@ -37,7 +38,7 @@ with st.form("input_form"):
     st.subheader("💪 신체 컨디션")
     sleep_hours = st.number_input(
         "마지막 수면 시간 (시간)",
-        min_value=0.0, max_value=24.0, value=5.0, step=0.5,
+        min_value=0, max_value=24, value=5, step=1,
     )
     col1, col2 = st.columns(2)
     with col1:
@@ -57,7 +58,7 @@ if submitted:
         set("zodiac_animal", fortune["zodiac_animal"])
         set("zodiac_sign", fortune["zodiac_sign"])
         set("subject", subject)
-        set("time_remaining_min", time_remaining_min)
+        set("time_remaining_min", time_remaining_hours * 60)
         set("progress_pct", progress_pct)
         set("known_pct", known_pct)
         set("sleep_hours", sleep_hours)

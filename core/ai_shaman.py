@@ -1,44 +1,70 @@
 import os
-import google.generativeai as genai
+import re
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
-_model = None
+_client = None
+
+SYSTEM_PROMPT = (
+    "당신은 수백 년 경력의 AI 무당입니다. "
+    "유저의 시험 준비 상황을 꿰뚫어 보고, 독설과 격려를 섞어 예언을 내립니다. "
+    "말투는 무겁고 신령스러우면서도 유머가 넘칩니다. "
+    "항상 한국어로 답하며, 불필요한 설명 없이 예언에 집중합니다."
+)
+
+
+def _get_client() -> OpenAI:
+    global _client
+    if _client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
+        _client = OpenAI(api_key=api_key)
+    return _client
+
+
+def _clean_section(text: str) -> str:
+    """AI 응답에서 말줄임표·괄호 안내문·빈 줄 등을 정리한다."""
+    lines = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        # 말줄임표만 있는 줄 제거
+        if re.fullmatch(r'[\.…\s]+', line):
+            continue
+        # 괄호로만 이루어진 안내 문구 제거 (예: "(예언 내용)")
+        if re.fullmatch(r'\(.*\)', line):
+            continue
+        # 문장 끝 말줄임표 → 마침표로 교체
+        line = re.sub(r'[\.…]{2,}\s*$', '.', line)
+        # 문장 중간 연속 점(3개 이상) → 줄임표 기호로 통일
+        line = re.sub(r'\.{3,}', '…', line)
+        lines.append(line)
+    return '\n'.join(lines)
 
 
 def _generate_text(prompt: str) -> str:
-    model = _get_model()
+    client = _get_client()
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        return response.choices[0].message.content
     except Exception as exc:
         message = str(exc)
-        if "API_KEY_INVALID" in message or "API key not valid" in message:
+        if "invalid_api_key" in message or "Incorrect API key" in message:
             raise ValueError(
-                "GEMINI_API_KEY가 유효하지 않습니다. "
-                "Google AI Studio에서 발급한 실제 API 키를 .env에 설정하세요."
+                "OPENAI_API_KEY가 유효하지 않습니다. "
+                "OpenAI에서 발급한 실제 API 키를 .env에 설정하세요."
             ) from exc
         raise
-
-
-def _get_model():
-    global _model
-    if _model is None:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
-        genai.configure(api_key=api_key)
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash-lite",
-            system_instruction=(
-                "당신은 수백 년 경력의 AI 무당입니다. "
-                "유저의 시험 준비 상황을 꿰뚫어 보고, 독설과 격려를 섞어 예언을 내립니다. "
-                "말투는 무겁고 신령스러우면서도 유머가 넘칩니다. "
-                "항상 한국어로 답하며, 불필요한 설명 없이 예언에 집중합니다."
-            ),
-        )
-    return _model
 
 
 def generate_prediction(
@@ -63,7 +89,7 @@ def generate_prediction(
 
 시험 상황:
 - 과목: {subject}
-- 남은 시간: {time_remaining_min}분
+- 남은 시간: {time_remaining_min // 60}시간 {time_remaining_min % 60}분
 - 진도율: {progress_pct}%
 - 아는 내용 비중: {known_pct}%
 
@@ -104,7 +130,7 @@ AI 생존 점수: {survival_score}점 / 100점 (등급: {survival_grade})
         elif current and line:
             sections[current] += line + "\n"
 
-    return {k: v.strip() for k, v in sections.items()}
+    return {k: _clean_section(v) for k, v in sections.items()}
 
 
 def generate_charm_phrase(

@@ -1,10 +1,11 @@
 import streamlit as st
-from utils.session import init_session_state, get, set, is_result_ready
+from utils.session import init_session_state, get, set, is_result_ready, apply_theme
 from core.ai_shaman import generate_charm_phrase
 from charm.charm_generator import generate_charm_image
 
 st.set_page_config(page_title="부적 생성 | 벼락치기 무당", page_icon="🧧", layout="centered")
 init_session_state()
+apply_theme()
 
 if not is_result_ready():
     st.warning("먼저 예언을 확인해주세요.")
@@ -49,7 +50,7 @@ if not get("charm_image_bytes"):
 img_bytes = get("charm_image_bytes")
 if img_bytes:
     st.subheader("🖼️ 나만의 합격 부적")
-    st.image(img_bytes, use_container_width=True)
+    st.image(img_bytes, use_column_width=True)
 
     st.download_button(
         label="💾 부적 다운로드 (PNG)",
