@@ -28,7 +28,8 @@ def apply_theme():
         [data-testid="stAppDeployButton"],
         [data-testid="stToolbar"],
         #MainMenu,
-        header {{ visibility: hidden; }}
+        header,
+        footer {{ visibility: hidden; }}
 
         /* ── 배경: 라디알 그라데이션 + 구름 패턴 ── */
         .stApp {{
